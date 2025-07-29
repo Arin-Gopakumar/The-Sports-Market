@@ -38,8 +38,29 @@ class TimeframeAlgorithm:
         
         # Apply archetype-specific projection multiplier
         if player_archetype == "Superstars" and timeframe == "weekly":
-            # Boost weekly superstar projections by 2.75%
-            projected = [stat * 1.0275 for stat in projected]
+            # Boost weekly superstar projections by 3.25%
+            projected = [stat * 1.0325 for stat in projected]
+        elif player_archetype == "Elite Playmakers" and timeframe == "weekly":
+            # Boost weekly elite playmaker projections by 3.25% (2.5% + 0.75%)
+            projected = [stat * 1.0325 for stat in projected]
+        elif player_archetype == "Versatile" and timeframe == "weekly":
+            # Boost weekly versatile projections by 4.5% (3% + 1% + 0.5%)
+            projected = [stat * 1.045 for stat in projected]
+        elif player_archetype == "One Dimensional" and timeframe == "weekly":
+            # Boost weekly one dimensional projections by 0.5%
+            projected = [stat * 1.005 for stat in projected]
+        elif player_archetype == "Role Players" and timeframe == "weekly":
+            # Boost weekly role player projections by 0.55% (0.3% + 0.25%)
+            projected = [stat * 1.0055 for stat in projected]
+        elif player_archetype == "Turnover Prone" and timeframe == "weekly":
+            # Reduce weekly turnover prone projections by 2%
+            projected = [stat * 0.98 for stat in projected]
+        elif player_archetype == "Rebounding Machines" and timeframe == "weekly":
+            # Reduce weekly rebounding machine projections by 1.3%
+            projected = [stat * 0.987 for stat in projected]
+        elif player_archetype == "High Volume Scorers" and timeframe == "weekly":
+            # Reduce weekly high volume scorer projections by 1.3%
+            projected = [stat * 0.987 for stat in projected]
         
         return tuple(projected)
     
@@ -270,11 +291,11 @@ class TimeframeAlgorithm:
         """
         if player_archetype == "Superstars":
             return {
-                'pts': 0.25,
-                'reb': 0.15,
-                'ast': 0.15,
-                'to': 0.10,
-                'stocks': 0.15,
+                'pts': 0.35,
+                'reb': 0.125,
+                'ast': 0.125,
+                'to': 0.075,
+                'stocks': 0.125,
                 'threepm': 0.10,
                 'ts%': 0.10
             }
@@ -330,13 +351,13 @@ class TimeframeAlgorithm:
             }
         elif player_archetype == "Bench Warmers":
             return {
-                'pts': 0.425,
-                'reb': 0.175,
-                'ast': 0.175,
+                'pts': 0.30,
+                'reb': 0.20,
+                'ast': 0.20,
                 'to': 0.05,
-                'stocks': 0.075,
+                'stocks': 0.10,
                 'threepm': 0.05,
-                'ts%': 0.05
+                'ts%': 0.10
             }
         elif player_archetype == "High Efficiency":
             return {
@@ -360,13 +381,13 @@ class TimeframeAlgorithm:
             }
         elif player_archetype == "One Dimensional":
             return {
-                'pts': 0.45,
-                'reb': 0.15,
-                'ast': 0.15,
+                'pts': 0.35,
+                'reb': 0.175,
+                'ast': 0.175,
                 'to': 0.05,
-                'stocks': 0.10,
+                'stocks': 0.125,
                 'threepm': 0.03,
-                'ts%': 0.07
+                'ts%': 0.095
             }
         elif player_archetype == "Versatile":
             return {
