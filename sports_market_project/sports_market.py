@@ -15,8 +15,9 @@ class SportsMarket:
         
         players = {}
         
-        # Player types and their stat characteristics
+        # Enhanced player types with more diversity
         player_types = [
+            # Original 100 players (keeping existing structure)
             # Role players (low stats, high efficiency)
             {'count': 20, 'pts_range': (5, 12), 'reb_range': (1, 4), 'ast_range': (1, 3), 
              'stocks_range': (0.5, 1.5), 'to_range': (0.5, 1.5), 'threepm_range': (0, 2), 'ts_range': (0.55, 0.65)},
@@ -43,21 +44,79 @@ class SportsMarket:
             
             # Centers (high rebounds, moderate scoring)
             {'count': 10, 'pts_range': (8, 18), 'reb_range': (8, 12), 'ast_range': (1, 3), 
-             'stocks_range': (1.5, 3.0), 'to_range': (1.5, 3), 'threepm_range': (0, 1), 'ts_range': (0.55, 0.65)}
+             'stocks_range': (1.5, 3.0), 'to_range': (1.5, 3), 'threepm_range': (0, 1), 'ts_range': (0.55, 0.65)},
+            
+            # NEW: 100 Additional Diverse Players
+            
+            # Superstars (elite all-around)
+            {'count': 8, 'pts_range': (25, 35), 'reb_range': (6, 12), 'ast_range': (6, 10), 
+             'stocks_range': (1.8, 3.5), 'to_range': (2.5, 4.5), 'threepm_range': (2, 6), 'ts_range': (0.58, 0.68)},
+            
+            # Elite 3-point shooters (high volume, high efficiency)
+            {'count': 12, 'pts_range': (15, 25), 'reb_range': (2, 5), 'ast_range': (2, 5), 
+             'stocks_range': (0.5, 1.5), 'to_range': (1.5, 3), 'threepm_range': (3, 6), 'ts_range': (0.60, 0.70)},
+            
+            # Elite defenders (very high stocks)
+            {'count': 10, 'pts_range': (6, 14), 'reb_range': (3, 7), 'ast_range': (1, 4), 
+             'stocks_range': (2.5, 4.0), 'to_range': (1, 2.5), 'threepm_range': (0, 2), 'ts_range': (0.50, 0.60)},
+            
+            # High-volume scorers (inefficient)
+            {'count': 8, 'pts_range': (20, 30), 'reb_range': (3, 6), 'ast_range': (2, 5), 
+             'stocks_range': (0.5, 1.8), 'to_range': (3, 5), 'threepm_range': (1, 4), 'ts_range': (0.45, 0.55)},
+            
+            # Elite playmakers (very high assists)
+            {'count': 8, 'pts_range': (10, 20), 'reb_range': (2, 5), 'ast_range': (8, 12), 
+             'stocks_range': (0.8, 2.0), 'to_range': (3, 5), 'threepm_range': (1, 3), 'ts_range': (0.52, 0.62)},
+            
+            # Rebounding machines (very high rebounds)
+            {'count': 8, 'pts_range': (8, 16), 'reb_range': (10, 15), 'ast_range': (1, 3), 
+             'stocks_range': (1.0, 2.5), 'to_range': (1.5, 3), 'threepm_range': (0, 1), 'ts_range': (0.55, 0.65)},
+            
+            # Bench warmers (very low stats)
+            {'count': 10, 'pts_range': (2, 6), 'reb_range': (0.5, 2), 'ast_range': (0.5, 2), 
+             'stocks_range': (0.2, 1.0), 'to_range': (0.5, 1.5), 'threepm_range': (0, 1), 'ts_range': (0.45, 0.55)},
+            
+            # High-efficiency role players
+            {'count': 12, 'pts_range': (8, 15), 'reb_range': (3, 6), 'ast_range': (2, 4), 
+             'stocks_range': (1.0, 2.0), 'to_range': (1, 2), 'threepm_range': (1, 3), 'ts_range': (0.62, 0.72)},
+            
+            # Turnover-prone players
+            {'count': 6, 'pts_range': (12, 20), 'reb_range': (3, 6), 'ast_range': (4, 8), 
+             'stocks_range': (0.8, 2.0), 'to_range': (4, 6), 'threepm_range': (1, 3), 'ts_range': (0.50, 0.60)},
+            
+            # One-dimensional scorers (high points, low everything else)
+            {'count': 8, 'pts_range': (18, 28), 'reb_range': (1, 3), 'ast_range': (1, 3), 
+             'stocks_range': (0.3, 1.2), 'to_range': (2, 4), 'threepm_range': (1, 4), 'ts_range': (0.52, 0.62)},
+            
+            # Versatile role players (moderate everything)
+            {'count': 10, 'pts_range': (10, 18), 'reb_range': (4, 7), 'ast_range': (3, 6), 
+             'stocks_range': (1.2, 2.2), 'to_range': (1.5, 3), 'threepm_range': (1, 3), 'ts_range': (0.54, 0.64)}
         ]
         
-        # Generate random player names
+        # Enhanced name generation with more variety
         first_names = ["James", "Michael", "David", "John", "Robert", "William", "Richard", "Joseph", "Thomas", "Christopher",
                       "Charles", "Daniel", "Matthew", "Anthony", "Mark", "Donald", "Steven", "Paul", "Andrew", "Joshua",
                       "Kenneth", "Kevin", "Brian", "George", "Edward", "Ronald", "Timothy", "Jason", "Jeffrey", "Ryan",
                       "Jacob", "Gary", "Nicholas", "Eric", "Jonathan", "Stephen", "Larry", "Justin", "Scott", "Brandon",
-                      "Benjamin", "Samuel", "Frank", "Gregory", "Raymond", "Alexander", "Patrick", "Jack", "Dennis", "Jerry"]
+                      "Benjamin", "Samuel", "Frank", "Gregory", "Raymond", "Alexander", "Patrick", "Jack", "Dennis", "Jerry",
+                      # Additional names for variety
+                      "Marcus", "Terry", "Sean", "Keith", "Tyler", "Jesse", "Aaron", "Adam", "Nathan", "Henry",
+                      "Douglas", "Zachary", "Peter", "Kyle", "Walter", "Ethan", "Jeremy", "Harold", "Roger", "Carl",
+                      "Gerald", "Keith", "Samuel", "Willie", "Ralph", "Lawrence", "Nicholas", "Roy", "Benjamin", "Bruce",
+                      "Bryan", "Christian", "Eugene", "Louis", "Wayne", "Alan", "Juan", "Howard", "Ethan", "Jose",
+                      "Billy", "Jordan", "Albert", "Dylan", "Corey", "Shane", "Cody", "Devin", "Cory", "Neil"]
         
         last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez",
                      "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin",
                      "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson",
                      "Walker", "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill", "Flores",
-                     "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell", "Mitchell", "Carter", "Roberts"]
+                     "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell", "Mitchell", "Carter", "Roberts",
+                     # Additional names for variety
+                     "Gomez", "Phillips", "Evans", "Turner", "Diaz", "Parker", "Cruz", "Edwards", "Collins", "Stewart",
+                     "Morris", "Morales", "Rogers", "Reed", "Cook", "Morgan", "Bell", "Murphy", "Bailey", "Cooper",
+                     "Richardson", "Cox", "Howard", "Ward", "Torres", "Peterson", "Gray", "Ramirez", "James", "Watson",
+                     "Brooks", "Kelly", "Sanders", "Price", "Bennett", "Wood", "Barnes", "Ross", "Henderson", "Coleman",
+                     "Jenkins", "Perry", "Powell", "Long", "Patterson", "Hughes", "Flores", "Washington", "Butler", "Simmons"]
         
         player_id = 1
         

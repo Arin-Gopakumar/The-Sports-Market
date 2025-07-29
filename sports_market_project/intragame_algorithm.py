@@ -53,10 +53,11 @@ class IntragameAlgorithm:
         
         return z_scores
     
-    def calculate_pps(self, z_scores):
+    def calculate_pps(self, z_scores, player_archetype=None):
         """
-        Calculate Weighted PPS (Performance Points Score)
+        Calculate Weighted PPS (Performance Points Score) - Intragame uses default weights only
         """
+        # Default weights (same as original)
         weights = {
             'pts': 0.45,
             'reb': 0.15,
@@ -109,7 +110,7 @@ class IntragameAlgorithm:
         
         return new_price, price_change_pct
     
-    def simulate_intragame(self, actual_stats, season_avg, last_5_avg, old_price):
+    def simulate_intragame(self, actual_stats, season_avg, last_5_avg, old_price, player_archetype=None):
         """
         Complete intragame simulation
         
@@ -118,6 +119,7 @@ class IntragameAlgorithm:
             season_avg: tuple of season averages
             last_5_avg: tuple of last 5 games averages
             old_price: float, current stock price
+            player_archetype: str, player archetype for PPS weighting
         
         Returns:
             dict with all calculations and results
@@ -132,7 +134,7 @@ class IntragameAlgorithm:
         z_scores = self.calculate_z_scores(actual_stats, projected_stats, std_devs)
         
         # Step 4: Calculate PPS
-        pps = self.calculate_pps(z_scores)
+        pps = self.calculate_pps(z_scores, player_archetype)
         
         # Step 5: Calculate DIS
         dis = self.calculate_dis(pps)

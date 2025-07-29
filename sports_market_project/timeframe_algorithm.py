@@ -5,7 +5,7 @@ class TimeframeAlgorithm:
     def __init__(self):
         pass
     
-    def calculate_projected_stats(self, season_avg, recent_avg, timeframe, use_2023_stats=False):
+    def calculate_projected_stats(self, season_avg, recent_avg, timeframe, use_2023_stats=False, player_archetype=None):
         """
         Calculate projected stats per game based on timeframe
         
@@ -14,6 +14,7 @@ class TimeframeAlgorithm:
             recent_avg: tuple of recent averages
             timeframe: str, 'weekly', 'monthly', or 'season'
             use_2023_stats: bool, if True, use 2023-2024 stats for season projections
+            player_archetype: str, player archetype for projection adjustments
         """
         if timeframe == "weekly":
             # Weekly: 0.5 × Season Avg + 0.5 × Last 4 Games Avg
@@ -35,9 +36,14 @@ class TimeframeAlgorithm:
         else:
             raise ValueError("Invalid timeframe. Use 'weekly', 'monthly', or 'season'")
         
+        # Apply archetype-specific projection multiplier
+        if player_archetype == "Superstars" and timeframe == "weekly":
+            # Boost weekly superstar projections by 2.75%
+            projected = [stat * 1.0275 for stat in projected]
+        
         return tuple(projected)
     
-    def calculate_standard_deviations(self, projected_stats, timeframe):
+    def calculate_standard_deviations(self, projected_stats, timeframe, player_archetype=None):
         """
         Calculate standard deviations using timeframe-specific alpha values
         """
@@ -45,15 +51,7 @@ class TimeframeAlgorithm:
         
         # Define alpha values for each timeframe
         if timeframe == "weekly":
-            alphas = {
-                'pts': 1.418,
-                'reb': 0.945,
-                'ast': 0.945,
-                'to': 0.958,
-                'stocks': 0.958,
-                'threepm': 0.958,
-                'ts%': 0.07
-            }
+            alphas = self._get_weekly_alphas(player_archetype, projected_stats)
         elif timeframe == "monthly":
             alphas = {
                 'pts': 0.809,
@@ -87,6 +85,122 @@ class TimeframeAlgorithm:
         
         return std_devs
     
+    def _get_weekly_alphas(self, player_archetype, projected_stats):
+        """
+        Get archetype-specific weekly alpha values
+        """
+        # Default weekly alphas
+        default_alphas = {
+            'pts': 1.418,
+            'reb': 0.945,
+            'ast': 0.945,
+            'to': 0.958,
+            'stocks': 0.958,
+            'threepm': 0.958,
+            'ts%': 0.07
+        }
+        
+        if not player_archetype:
+            return default_alphas
+        
+        # Archetype-specific alpha values
+        if player_archetype == "Superstars":
+            return {
+                'pts': 1.6,      # +12.8%
+                'reb': 1.1,      # +16.4%
+                'ast': 1.1,      # +16.4%
+                'to': 0.958,     # unchanged
+                'stocks': 0.958, # unchanged
+                'threepm': 0.958, # unchanged
+                'ts%': 0.07      # unchanged
+            }
+        elif player_archetype == "Versatile":
+            return {
+                'pts': 1.702,    # +20%
+                'reb': 1.134,    # +20%
+                'ast': 1.134,    # +20%
+                'to': 1.150,     # +20%
+                'stocks': 1.150, # +20%
+                'threepm': 1.150, # +20%
+                'ts%': 0.084     # +20%
+            }
+        elif player_archetype == "Elite Playmakers":
+            return {
+                'pts': 1.418,    # unchanged
+                'reb': 0.945,    # unchanged
+                'ast': 1.2,      # +27.0%
+                'to': 0.958,     # unchanged
+                'stocks': 0.958, # unchanged
+                'threepm': 0.958, # unchanged
+                'ts%': 0.07      # unchanged
+            }
+        elif player_archetype == "High Volume Scorers":
+            return {
+                'pts': 1.3,      # -8.3%
+                'reb': 0.945,    # unchanged
+                'ast': 0.945,    # unchanged
+                'to': 0.958,     # unchanged
+                'stocks': 0.958, # unchanged
+                'threepm': 0.958, # unchanged
+                'ts%': 0.07      # unchanged
+            }
+        elif player_archetype == "Rebounding Machines":
+            return {
+                'pts': 1.418,    # unchanged
+                'reb': 0.85,     # -10.1%
+                'ast': 0.945,    # unchanged
+                'to': 0.958,     # unchanged
+                'stocks': 0.958, # unchanged
+                'threepm': 0.958, # unchanged
+                'ts%': 0.07      # unchanged
+            }
+        elif player_archetype == "Bench Warmers":
+            return {
+                'pts': 1.45,     # +2.3%
+                'reb': 0.945,    # unchanged
+                'ast': 0.945,    # unchanged
+                'to': 0.958,     # unchanged
+                'stocks': 0.958, # unchanged
+                'threepm': 0.958, # unchanged
+                'ts%': 0.07      # unchanged
+            }
+        elif player_archetype == "Turnover Prone":
+            return {
+                'pts': 1.418,    # unchanged
+                'reb': 0.945,    # unchanged
+                'ast': 0.945,    # unchanged
+                'to': 1.1,       # +14.8%
+                'stocks': 0.958, # unchanged
+                'threepm': 0.958, # unchanged
+                'ts%': 0.07      # unchanged
+            }
+        elif player_archetype == "One Dimensional":
+            # Find signature stat (highest stat excluding ts%)
+            pts, reb, ast, to, stocks, threepm, ts_pct = projected_stats
+            stats = [pts, reb, ast, to, stocks, threepm]
+            stat_names = ['pts', 'reb', 'ast', 'to', 'stocks', 'threepm']
+            max_index = stats.index(max(stats))
+            signature_stat = stat_names[max_index]
+            
+            # Start with default alphas
+            alphas = default_alphas.copy()
+            # Raise signature stat by 8%
+            alphas[signature_stat] *= 1.08
+            return alphas
+        elif player_archetype == "Role Players":
+            return {
+                'pts': 1.489,    # +5%
+                'reb': 0.992,    # +5%
+                'ast': 0.992,    # +5%
+                'to': 1.006,     # +5%
+                'stocks': 1.006, # +5%
+                'threepm': 1.006, # +5%
+                'ts%': 0.074     # +5%
+            }
+        else:
+            # Default for Elite Shooters, Elite Defenders, High Efficiency
+            return default_alphas
+    
     def calculate_actual_averages(self, actual_totals, num_games):
         """
         Calculate actual per-game averages from totals
@@ -116,11 +230,12 @@ class TimeframeAlgorithm:
         
         return z_scores
     
-    def calculate_pps(self, z_scores):
+    def calculate_pps(self, z_scores, player_archetype=None):
         """
-        Calculate PPS (Performance Points Score)
+        Calculate PPS (Performance Points Score) with archetype-specific weightings
         """
-        weights = {
+        # Default weights
+        default_weights = {
             'pts': 0.45,
             'reb': 0.15,
             'ast': 0.15,
@@ -130,10 +245,162 @@ class TimeframeAlgorithm:
             'ts%': 0.05
         }
         
-        pps = sum(weights[stat] * z_scores[stat] for stat in weights.keys())
+        if not player_archetype:
+            weights = default_weights
+        else:
+            weights = self._get_archetype_weights(player_archetype)
+        
+        # Calculate PPS with hard cap for weekly superstars
+        if player_archetype == "Superstars":
+            pps = 0
+            for stat, weight in weights.items():
+                contribution = weight * z_scores[stat]
+                # Hard cap: no single stat can contribute more than +1.5 to PPS
+                if contribution > 1.5:
+                    contribution = 1.5
+                pps += contribution
+        else:
+            pps = sum(weights[stat] * z_scores[stat] for stat in weights.keys())
+        
         return pps
     
-    def calculate_dis(self, pps):
+    def _get_archetype_weights(self, player_archetype):
+        """
+        Get archetype-specific PPS weights for weekly, monthly, and season algorithms
+        """
+        if player_archetype == "Superstars":
+            return {
+                'pts': 0.25,
+                'reb': 0.15,
+                'ast': 0.15,
+                'to': 0.10,
+                'stocks': 0.15,
+                'threepm': 0.10,
+                'ts%': 0.10
+            }
+        elif player_archetype == "Elite Shooters":
+            return {
+                'pts': 0.45,
+                'reb': 0.15,
+                'ast': 0.15,
+                'to': 0.05,
+                'stocks': 0.10,
+                'threepm': 0.05,
+                'ts%': 0.05
+            }
+        elif player_archetype == "Elite Defenders":
+            return {
+                'pts': 0.45,
+                'reb': 0.15,
+                'ast': 0.15,
+                'to': 0.05,
+                'stocks': 0.10,
+                'threepm': 0.05,
+                'ts%': 0.05
+            }
+        elif player_archetype == "High Volume Scorers":
+            return {
+                'pts': 0.425,
+                'reb': 0.125,
+                'ast': 0.125,
+                'to': 0.05,
+                'stocks': 0.075,
+                'threepm': 0.10,
+                'ts%': 0.10
+            }
+        elif player_archetype == "Elite Playmakers":
+            return {
+                'pts': 0.375,
+                'reb': 0.15,
+                'ast': 0.225,
+                'to': 0.05,
+                'stocks': 0.10,
+                'threepm': 0.05,
+                'ts%': 0.05
+            }
+        elif player_archetype == "Rebounding Machines":
+            return {
+                'pts': 0.375,
+                'reb': 0.15,
+                'ast': 0.225,
+                'to': 0.05,
+                'stocks': 0.10,
+                'threepm': 0.05,
+                'ts%': 0.05
+            }
+        elif player_archetype == "Bench Warmers":
+            return {
+                'pts': 0.425,
+                'reb': 0.175,
+                'ast': 0.175,
+                'to': 0.05,
+                'stocks': 0.075,
+                'threepm': 0.05,
+                'ts%': 0.05
+            }
+        elif player_archetype == "High Efficiency":
+            return {
+                'pts': 0.45,
+                'reb': 0.125,
+                'ast': 0.15,
+                'to': 0.05,
+                'stocks': 0.10,
+                'threepm': 0.05,
+                'ts%': 0.075
+            }
+        elif player_archetype == "Turnover Prone":
+            return {
+                'pts': 0.45,
+                'reb': 0.15,
+                'ast': 0.15,
+                'to': 0.025,
+                'stocks': 0.10,
+                'threepm': 0.05,
+                'ts%': 0.075
+            }
+        elif player_archetype == "One Dimensional":
+            return {
+                'pts': 0.45,
+                'reb': 0.15,
+                'ast': 0.15,
+                'to': 0.05,
+                'stocks': 0.10,
+                'threepm': 0.03,
+                'ts%': 0.07
+            }
+        elif player_archetype == "Versatile":
+            return {
+                'pts': 0.35,
+                'reb': 0.125,
+                'ast': 0.125,
+                'to': 0.075,
+                'stocks': 0.125,
+                'threepm': 0.10,
+                'ts%': 0.10
+            }
+        elif player_archetype == "Role Players":
+            return {
+                'pts': 0.425,
+                'reb': 0.175,
+                'ast': 0.175,
+                'to': 0.05,
+                'stocks': 0.075,
+                'threepm': 0.05,
+                'ts%': 0.05
+            }
+        else:
+            # Default weights for unknown archetypes
+            return {
+                'pts': 0.45,
+                'reb': 0.15,
+                'ast': 0.15,
+                'to': 0.05,
+                'stocks': 0.10,
+                'threepm': 0.05,
+                'ts%': 0.05
+            }
+    
+    def calculate_dis(self, pps, player_archetype=None):
         """
         Calculate Demand Imbalance Score (DIS)
         """
@@ -146,20 +413,25 @@ class TimeframeAlgorithm:
         dis = (buys - sells) / (buys + sells)
         return dis
     
-    def calculate_raw_delta(self, pps, dis):
+    def calculate_raw_delta(self, pps, dis, player_archetype=None):
         """
         Calculate raw delta
         """
         return 0.8 * pps + 0.2 * dis
     
-    def apply_dampening(self, raw_delta, timeframe):
+    def apply_dampening(self, raw_delta, timeframe, player_archetype=None):
         """
-        Apply dampening with special rules for season timeframe
+        Apply dampening with special rules for season timeframe and archetype-specific dampening
         """
         if raw_delta >= 0:
             # Upside dampening
             if timeframe in ["weekly", "monthly"]:
-                dampened = min(raw_delta / math.sqrt(max(1 - 0.1 * raw_delta**2, 0.001)), 10)
+                if player_archetype == "Superstars":
+                    # More aggressive upside dampening for superstars
+                    dampened = min(raw_delta / math.sqrt(max(1 - 0.1 * raw_delta**2, 0.001)), 10)
+                else:
+                    # Standard dampening for other archetypes
+                    dampened = min(raw_delta / math.sqrt(max(1 - 0.1 * raw_delta**2, 0.001)), 10)
             else:  # season
                 dampened = min(raw_delta / math.sqrt(max(1 - 0.1 * raw_delta**2, 0.001)), 50)
         else:
@@ -177,7 +449,7 @@ class TimeframeAlgorithm:
         
         return new_price, price_change_pct
     
-    def simulate_timeframe(self, actual_totals, num_games, season_avg, recent_avg, old_price, timeframe, use_2023_stats=False):
+    def simulate_timeframe(self, actual_totals, num_games, season_avg, recent_avg, old_price, timeframe, use_2023_stats=False, player_archetype=None):
         """
         Complete timeframe simulation
         
@@ -194,10 +466,10 @@ class TimeframeAlgorithm:
             dict with all calculations and results
         """
         # Step 1: Calculate projected stats per game
-        projected_stats = self.calculate_projected_stats(season_avg, recent_avg, timeframe, use_2023_stats)
+        projected_stats = self.calculate_projected_stats(season_avg, recent_avg, timeframe, use_2023_stats, player_archetype)
         
         # Step 2: Calculate standard deviations
-        std_devs = self.calculate_standard_deviations(projected_stats, timeframe)
+        std_devs = self.calculate_standard_deviations(projected_stats, timeframe, player_archetype)
         
         # Step 3: Calculate actual per-game averages
         actual_avg = self.calculate_actual_averages(actual_totals, num_games)
@@ -206,16 +478,16 @@ class TimeframeAlgorithm:
         z_scores = self.calculate_z_scores(actual_avg, projected_stats, std_devs)
         
         # Step 5: Calculate PPS
-        pps = self.calculate_pps(z_scores)
+        pps = self.calculate_pps(z_scores, player_archetype)
         
         # Step 6: Calculate DIS
-        dis = self.calculate_dis(pps)
+        dis = self.calculate_dis(pps, player_archetype)
         
         # Step 7: Calculate raw delta
-        raw_delta = self.calculate_raw_delta(pps, dis)
+        raw_delta = self.calculate_raw_delta(pps, dis, player_archetype)
         
         # Step 8: Apply dampening
-        dampened_delta = self.apply_dampening(raw_delta, timeframe)
+        dampened_delta = self.apply_dampening(raw_delta, timeframe, player_archetype)
         
         # Step 9: Calculate new price
         new_price, price_change_pct = self.calculate_new_price(old_price, dampened_delta)
