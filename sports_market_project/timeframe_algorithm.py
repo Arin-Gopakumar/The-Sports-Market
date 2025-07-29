@@ -44,8 +44,8 @@ class TimeframeAlgorithm:
             # Boost weekly elite playmaker projections by 3.25% (2.5% + 0.75%)
             projected = [stat * 1.0325 for stat in projected]
         elif player_archetype == "Versatile" and timeframe == "weekly":
-            # Boost weekly versatile projections by 4.5% (3% + 1% + 0.5%)
-            projected = [stat * 1.045 for stat in projected]
+            # Boost weekly versatile projections by 4.25% (3% + 1% + 0.5% - 0.25%)
+            projected = [stat * 1.0425 for stat in projected]
         elif player_archetype == "One Dimensional" and timeframe == "weekly":
             # Boost weekly one dimensional projections by 0.5%
             projected = [stat * 1.005 for stat in projected]
