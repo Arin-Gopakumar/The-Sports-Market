@@ -687,16 +687,19 @@ class SportsMarketSimulator:
                         for i in range(7):
                             actual_totals[i] += game[i]
                     
-                    # Run simulation
-                    if algorithm == "season":
-                        season_avg_2023 = player_data["season_avg_2023"]
-                        result = self.timeframe_algo.simulate_timeframe(
-                            tuple(actual_totals), len(sampled_games), season_avg_2023, recent_avg, investment_amount, algorithm, use_2023_stats=True, player_archetype=None
-                        )
-                    else:
-                        result = self.timeframe_algo.simulate_timeframe(
-                            tuple(actual_totals), len(sampled_games), season_avg, recent_avg, investment_amount, algorithm, player_archetype=None
-                        )
+                                            # Get player archetype
+                        player_archetype = self.sports_market.get_player_archetype(player_name)
+                        
+                        # Run simulation
+                        if algorithm == "season":
+                            season_avg_2023 = player_data["season_avg_2023"]
+                            result = self.timeframe_algo.simulate_timeframe(
+                                tuple(actual_totals), len(sampled_games), season_avg_2023, recent_avg, investment_amount, algorithm, use_2023_stats=True, player_archetype=player_archetype
+                            )
+                        else:
+                            result = self.timeframe_algo.simulate_timeframe(
+                                tuple(actual_totals), len(sampled_games), season_avg, recent_avg, investment_amount, algorithm, player_archetype=player_archetype
+                            )
                     
                     # Calculate P&L with 1% fee (bank perspective)
                     price_change_pct = result['price_change_pct'] / 100

@@ -202,6 +202,43 @@ class SportsMarket:
         n_games = len(games)
         return tuple(total / n_games for total in totals)
     
+    def get_player_archetype(self, player_name):
+        """
+        Determine player archetype based on their stats
+        """
+        if player_name not in self.players:
+            return None
+        
+        player_data = self.players[player_name]
+        season_avg = player_data["season_avg_2024"]
+        pts, reb, ast, to, stocks, threepm, ts_pct = season_avg
+        
+        # Determine archetype based on stats
+        if pts >= 25 and ast >= 6:
+            return "Superstars"
+        elif threepm >= 3 and ts_pct >= 0.60:
+            return "Elite Shooters"
+        elif stocks >= 2.5:
+            return "Elite Defenders"
+        elif pts >= 20 and ts_pct <= 0.55:
+            return "High Volume Scorers"
+        elif ast >= 8:
+            return "Elite Playmakers"
+        elif reb >= 10:
+            return "Rebounding Machines"
+        elif pts <= 6:
+            return "Bench Warmers"
+        elif ts_pct >= 0.62:
+            return "High Efficiency"
+        elif to >= 4:
+            return "Turnover Prone"
+        elif pts >= 18 and reb <= 3 and ast <= 3:
+            return "One Dimensional"
+        elif pts >= 10 and pts <= 18 and reb >= 4 and ast >= 3:
+            return "Versatile"
+        else:
+            return "Role Players"
+    
     def get_player_data(self, player_name):
         """Get player data by name"""
         return self.players.get(player_name)
